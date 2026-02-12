@@ -1,0 +1,11 @@
+version: '3.9'
+services:
+  directoryms:
+    build:
+      context: .
+      dockerfile: src/DirectoryMS/Dockerfile
+    container_name: hygea-directoryms
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
