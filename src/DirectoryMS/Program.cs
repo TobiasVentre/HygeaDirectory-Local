@@ -1,6 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using DirectoryMS.Application.Interfaces;
 using DirectoryMS.Application.UseCases;
-using DirectoryMS.Infrastructure.Repositories;
+using DirectoryMS.Infrastructure;
+using DirectoryMS.Infrastructure.Persistence;
 using DirectoryMS.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,10 +22,16 @@ builder.Services.AddSwaggerGen(options =>
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-builder.Services.AddSingleton<IUserRepository, InMemoryUserRepository>();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IUserUseCase, UserUseCase>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<DirectoryDbContext>();
+    dbContext.Database.Migrate();
+}
 
 app.UseMiddleware<ApiExceptionMiddleware>();
 
